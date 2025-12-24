@@ -2,16 +2,22 @@
 using AssetRipper.GUI.Web;
 using System.Diagnostics;
 
+// Check for --open-export flag
+bool openExport = args.Contains("--open-export", StringComparer.OrdinalIgnoreCase);
+
+// Filter out the flag to get the actual arguments
+string[] pathArgs = args.Where(arg => !arg.Equals("--open-export", StringComparison.OrdinalIgnoreCase)).ToArray();
+
 // If command line arguments are not provided, show usage and exit
-if (args.Length < 2)
+if (pathArgs.Length < 2)
 {
 	Logger.Error("Usage: AssetRipper.CLI <Game Path> <Export Path> [--open-export]");
+	Logger.Error("       --open-export can be placed anywhere in the command line");
 	return;
 }
 
-string importGamePath = args[0];
-string exportPath = args[1];
-bool openExport = args.Contains("--open-export", StringComparer.OrdinalIgnoreCase);
+string importGamePath = pathArgs[0];
+string exportPath = pathArgs[1];
 
 // If the game path does not exist, show error and exit
 if (!System.IO.File.Exists(importGamePath) && !System.IO.Directory.Exists(importGamePath))
