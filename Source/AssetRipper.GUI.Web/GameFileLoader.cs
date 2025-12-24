@@ -55,7 +55,7 @@ public static class GameFileLoader
 		GameData = ExportHandler.LoadAndProcess(paths, LocalFileSystem.Instance);
 	}
 
-	public static async Task ExportUnityProject(string path)
+	public static async Task<bool> ExportUnityProject(string path)
 	{
 		if (IsLoaded && IsValidExportDirectory(path))
 		{
@@ -64,14 +64,16 @@ public static class GameFileLoader
 				if (!await UserConsentsToDeletion())
 				{
 					Logger.Info(LogCategory.Export, "User declined to delete existing export directory. Aborting export.");
-					return;
+					return false;
 				}
 				Directory.Delete(path, true);
 			}
 
 			Directory.CreateDirectory(path);
 			ExportHandler.Export(GameData, path, LocalFileSystem.Instance);
+			return true;
 		}
+		return false;
 	}
 
 	public static async Task ExportPrimaryContent(string path)
