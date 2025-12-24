@@ -36,16 +36,30 @@ if (System.IO.File.Exists(exportPath))
 // If export path is a non-empty directory, prompt user to continue
 if (System.IO.Directory.Exists(exportPath))
 {
-	int fileCount = System.IO.Directory.GetFiles(exportPath).Length;
-	int dirCount = System.IO.Directory.GetDirectories(exportPath).Length;
+	int fileCount = System.IO.Directory.GetFiles(exportPath, "*", System.IO.SearchOption.AllDirectories).Length;
+	int dirCount = System.IO.Directory.GetDirectories(exportPath, "*", System.IO.SearchOption.AllDirectories).Length;
 	if (fileCount > 0 || dirCount > 0)
 	{
-		Logger.Warning($"The specified export path '{exportPath}' is a non-empty directory ({fileCount} files, {dirCount} folders).");
-		string input = Logger.Prompt("Do you want to continue? (y/n)");
+		Logger.Warning($"The selected export directory already exists and everything it contains will be deleted.");
+		Logger.Warning($"Directory: {exportPath}");
+		Logger.Warning($"Contents: {fileCount} files, {dirCount} folders");
+		string input = Logger.Prompt("Are you sure you want to continue? (y/n)");
 		if (!input.Trim().StartsWith("y", StringComparison.CurrentCultureIgnoreCase))
 		{
 			Logger.Info("Operation cancelled by user.");
 			return;
+		}
+
+		// Delete the existing directory
+		try
+		{
+			System.IO.Directory.Delete(exportPath, recursive: true);
+			Logger.Info("Export directory deleted successfully.");
+		}
+		catch
+		{
+			// Silent fail because AssetRipper will prompt
+			// user to delete the directory as fallback.
 		}
 	}
 }
