@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Source\AssetRipper.GUI.Web\AssetRipper.GUI.Web.csproj" />
-    <ProjectReference Include="..\Source\AssetRipper.Web\AssetRipper.Web.csproj" />
   </ItemGroup>
 
 </Project>
