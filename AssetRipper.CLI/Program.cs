@@ -66,7 +66,7 @@ if (System.IO.Directory.Exists(exportPath))
 
 try
 {
-	CLILogger.Info($"Loading game path: {importGamePath}");
+	CLILogger.Info($"Loading game path \"{importGamePath}\"...");
 	GameFileLoader.LoadAndProcess([importGamePath]);
 	if (!GameFileLoader.IsLoaded)
 	{
@@ -74,6 +74,8 @@ try
 		Environment.ExitCode = 1;
 		return;
 	}
+
+	CLILogger.Info($"Exporting game to \"{exportPath}\"...");
 
 	bool exportSuccess = await GameFileLoader.ExportUnityProject(exportPath);
 	if (exportSuccess)

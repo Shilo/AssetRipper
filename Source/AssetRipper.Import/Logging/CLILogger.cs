@@ -39,7 +39,7 @@ public static class CLILogger
         string typeString = type.ToString();
         string categoryString = category == LogCategory.None ? "None" : category.ToString();
         (string icon, ConsoleColor color) = GetIconAndColorForType(typeString);
-        string categoryPrefix = string.IsNullOrEmpty(categoryString) || categoryString == "None" ? "" : $"{categoryString} ";
+        string categoryPrefix = string.IsNullOrEmpty(categoryString) || categoryString == "None" ? "" : $"[{categoryString}] ";
         WriteColored($"{icon} {categoryPrefix}{message}", color);
     }
 
