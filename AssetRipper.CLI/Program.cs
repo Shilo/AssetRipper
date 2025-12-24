@@ -1,15 +1,17 @@
 ﻿using AssetRipper.CLI;
 using AssetRipper.GUI.Web;
+using System.Diagnostics;
 
 // If command line arguments are not provided, show usage and exit
 if (args.Length < 2)
 {
-	Logger.Error("Usage: AssetRipper.CLI <Game Path> <Export Path>");
+	Logger.Error("Usage: AssetRipper.CLI <Game Path> <Export Path> [--open-export]");
 	return;
 }
 
 string importGamePath = args[0];
 string exportPath = args[1];
+bool openExport = args.Contains("--open-export", StringComparer.OrdinalIgnoreCase);
 
 // If the game path does not exist, show error and exit
 if (!System.IO.File.Exists(importGamePath) && !System.IO.Directory.Exists(importGamePath))
@@ -57,6 +59,23 @@ try
 	if (exportSuccess)
 	{
 		Logger.Success($"Export completed successfully to: {exportPath}");
+
+		if (openExport)
+		{
+			try
+			{
+				Process.Start(new ProcessStartInfo
+				{
+					FileName = "explorer.exe",
+					Arguments = exportPath,
+					UseShellExecute = true
+				});
+			}
+			catch (Exception ex)
+			{
+				Logger.Warning($"Failed to open export folder: {ex.Message}");
+			}
+		}
 	}
 	else
 	{

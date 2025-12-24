@@ -22,7 +22,7 @@
                 "start",
                 "cmd",
                 "/c",
-                "${workspaceFolder}\\AssetRipper.CLI\\bin\\Release\\net10.0\\AssetRipper.CLI.exe ${workspaceFolder}\\test\\test.apk ${workspaceFolder}\\test\\src && pause"
+                "${workspaceFolder}\\AssetRipper.CLI\\bin\\Release\\net10.0\\AssetRipper.CLI.exe ${workspaceFolder}\\test\\test.apk ${workspaceFolder}\\test\\src --open-export & pause"
             ],
             "problemMatcher": [],
             "dependsOn": "build"
