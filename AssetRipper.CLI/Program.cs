@@ -1,5 +1,5 @@
-﻿using AssetRipper.CLI;
-using AssetRipper.GUI.Web;
+﻿using AssetRipper.GUI.Web;
+using AssetRipper.Import.Logging;
 using System.Diagnostics;
 
 // Check for --open-export flag
@@ -11,8 +11,8 @@ string[] pathArgs = args.Where(arg => !arg.Equals("--open-export", StringCompari
 // If command line arguments are not provided, show usage and exit
 if (pathArgs.Length < 2)
 {
-	Logger.Error("Usage: AssetRipper.CLI <Game Path> <Export Path> [--open-export]");
-	Logger.Error("       --open-export can be placed anywhere in the command line");
+	CLILogger.Error("Usage: AssetRipper.CLI <Game Path> <Export Path> [--open-export]");
+	CLILogger.Error("       --open-export can be placed anywhere in the command line");
 	return;
 }
 
@@ -22,14 +22,14 @@ string exportPath = pathArgs[1];
 // If the game path does not exist, show error and exit
 if (!System.IO.File.Exists(importGamePath) && !System.IO.Directory.Exists(importGamePath))
 {
-	Logger.Error($"The specified game path '{importGamePath}' does not exist.");
+	CLILogger.Error($"The specified game path '{importGamePath}' does not exist.");
 	return;
 }
 
 // If export path is a file, show error and exit
 if (System.IO.File.Exists(exportPath))
 {
-	Logger.Error($"The specified export path '{exportPath}' is a file.");
+	CLILogger.Error($"The specified export path '{exportPath}' is a file.");
 	return;
 }
 
@@ -40,13 +40,13 @@ if (System.IO.Directory.Exists(exportPath))
 	int dirCount = System.IO.Directory.GetDirectories(exportPath, "*", System.IO.SearchOption.AllDirectories).Length;
 	if (fileCount > 0 || dirCount > 0)
 	{
-		Logger.Warning($"The selected export directory already exists and everything it contains will be deleted.");
-		Logger.Warning($"Directory: {exportPath}");
-		Logger.Warning($"Contents: {fileCount} files, {dirCount} folders");
-		string input = Logger.Prompt("Are you sure you want to continue? (y/n)");
+		CLILogger.Warning($"The selected export directory already exists and everything it contains will be deleted.");
+		CLILogger.Warning($"Directory: {exportPath}");
+		CLILogger.Warning($"Contents: {fileCount} files, {dirCount} folders");
+		string input = CLILogger.Prompt("Are you sure you want to continue? (y/n)");
 		if (!input.Trim().StartsWith("y", StringComparison.CurrentCultureIgnoreCase))
 		{
-			Logger.Info("Operation cancelled by user.");
+			CLILogger.Info("Operation cancelled by user.");
 			return;
 		}
 
@@ -54,7 +54,7 @@ if (System.IO.Directory.Exists(exportPath))
 		try
 		{
 			System.IO.Directory.Delete(exportPath, recursive: true);
-			Logger.Info("Export directory deleted successfully.");
+			CLILogger.Info("Export directory deleted successfully.");
 		}
 		catch
 		{
@@ -66,11 +66,11 @@ if (System.IO.Directory.Exists(exportPath))
 
 try
 {
-	Logger.Info($"Loading game path: {importGamePath}");
+	CLILogger.Info($"Loading game path: {importGamePath}");
 	GameFileLoader.LoadAndProcess([importGamePath]);
 	if (!GameFileLoader.IsLoaded)
 	{
-		Logger.Error("Failed to load game path.");
+		CLILogger.Error("Failed to load game path.");
 		Environment.ExitCode = 1;
 		return;
 	}
@@ -78,7 +78,7 @@ try
 	bool exportSuccess = await GameFileLoader.ExportUnityProject(exportPath);
 	if (exportSuccess)
 	{
-		Logger.Success($"Export completed successfully to: {exportPath}");
+		CLILogger.Success($"Export completed successfully to: {exportPath}");
 
 		if (openExport)
 		{
@@ -93,19 +93,19 @@ try
 			}
 			catch (Exception ex)
 			{
-				Logger.Warning($"Failed to open export folder: {ex.Message}");
+				CLILogger.Warning($"Failed to open export folder: {ex.Message}");
 			}
 		}
 	}
 	else
 	{
-		Logger.Error("Export was cancelled or failed.");
+		CLILogger.Error("Export was cancelled or failed.");
 		Environment.ExitCode = 1;
 	}
 }
 catch (Exception ex)
 {
-	Logger.Error($"An error occurred: {ex.Message}");
+	CLILogger.Error($"An error occurred: {ex.Message}");
 	var originalColor = Console.ForegroundColor;
 	Console.ForegroundColor = ConsoleColor.DarkRed;
 	Console.WriteLine(ex.StackTrace);

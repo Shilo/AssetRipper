@@ -39,6 +39,8 @@ public static class Logger
 
 		lock (_lock)
 		{
+			CLILogger.LogWithCategory(type, category, message);
+
 			foreach (ILogger instance in loggers)
 			{
 				instance?.Log(type, category, message);

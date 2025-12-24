@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Source\AssetRipper.GUI.Web\AssetRipper.GUI.Web.csproj" />
+    <ProjectReference Include="..\Source\AssetRipper.Import\AssetRipper.Import.csproj" />
   </ItemGroup>
 
 </Project>
