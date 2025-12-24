@@ -62,6 +62,7 @@
     <File Path=".github/workflows/publish.yml" />
     <File Path=".github/workflows/test.yml" />
   </Folder>
+  <Project Path="AssetRipper.CLI/AssetRipper.CLI.csproj" Id="dc3ccb8a-88d8-4c5e-8eff-1c5fbe23da99" />
   <Project Path="Source/AssetRipper.AssemblyDumper.Downloader/AssetRipper.AssemblyDumper.Downloader.csproj" />
   <Project Path="Source/AssetRipper.AssemblyDumper.NativeEnumExtractor/AssetRipper.AssemblyDumper.NativeEnumExtractor.csproj" />
   <Project Path="Source/AssetRipper.AssemblyDumper.NuGetFixer/AssetRipper.AssemblyDumper.NuGetFixer.csproj" />
