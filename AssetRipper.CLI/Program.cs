@@ -1,9 +1,10 @@
-﻿using AssetRipper.GUI.Web;
+﻿using AssetRipper.CLI;
+using AssetRipper.GUI.Web;
 
 // If command line arguments are not provided, show usage and exit
 if (args.Length < 2)
 {
-	Console.WriteLine("Usage: AssetRipper.CLI <Game Path> <Export Path>");
+	Logger.Error("Usage: AssetRipper.CLI <Game Path> <Export Path>");
 	return;
 }
 
@@ -13,14 +14,14 @@ string exportPath = args[1];
 // If the game path does not exist, show error and exit
 if (!System.IO.File.Exists(importGamePath) && !System.IO.Directory.Exists(importGamePath))
 {
-	Console.WriteLine($"Error: The specified game path '{importGamePath}' does not exist.");
+	Logger.Error($"The specified game path '{importGamePath}' does not exist.");
 	return;
 }
 
 // If export path is a file, show error and exit
 if (System.IO.File.Exists(exportPath))
 {
-	Console.WriteLine($"Error: The specified export path '{exportPath}' is a file.");
+	Logger.Error($"The specified export path '{exportPath}' is a file.");
 	return;
 }
 
@@ -31,10 +32,11 @@ if (System.IO.Directory.Exists(exportPath))
 	int dirCount = System.IO.Directory.GetDirectories(exportPath).Length;
 	if (fileCount > 0 || dirCount > 0)
 	{
-		Console.WriteLine($"The specified export path '{exportPath}' is a non-empty directory ({fileCount} files, {dirCount} folders).\nDo you want to continue? (y/n)");
-		string input = Console.ReadLine() ?? "";
+		Logger.Warning($"The specified export path '{exportPath}' is a non-empty directory ({fileCount} files, {dirCount} folders).");
+		string input = Logger.Prompt("Do you want to continue? (y/n)");
 		if (!input.Trim().StartsWith("y", StringComparison.CurrentCultureIgnoreCase))
 		{
+			Logger.Info("Operation cancelled by user.");
 			return;
 		}
 	}
@@ -42,13 +44,32 @@ if (System.IO.Directory.Exists(exportPath))
 
 try
 {
-	Console.WriteLine($"Loading game path: {importGamePath}");
+	Logger.Info($"Loading game path: {importGamePath}");
 	GameFileLoader.LoadAndProcess([importGamePath]);
-	_ = GameFileLoader.ExportUnityProject(exportPath);
-	Console.WriteLine($"Export completed successfully to: {exportPath}");
+	if (!GameFileLoader.IsLoaded)
+	{
+		Logger.Error("Failed to load game path.");
+		Environment.ExitCode = 1;
+		return;
+	}
+
+	bool exportSuccess = await GameFileLoader.ExportUnityProject(exportPath);
+	if (exportSuccess)
+	{
+		Logger.Success($"Export completed successfully to: {exportPath}");
+	}
+	else
+	{
+		Logger.Error("Export was cancelled or failed.");
+		Environment.ExitCode = 1;
+	}
 }
 catch (Exception ex)
 {
-	Console.WriteLine($"Error: {ex.Message}");
+	Logger.Error($"An error occurred: {ex.Message}");
+	var originalColor = Console.ForegroundColor;
+	Console.ForegroundColor = ConsoleColor.DarkRed;
 	Console.WriteLine(ex.StackTrace);
+	Console.ForegroundColor = originalColor;
+	Environment.ExitCode = 1;
 }
